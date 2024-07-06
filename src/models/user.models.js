@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, {Schema} from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from 'bcrypt'
 
@@ -25,19 +25,19 @@ const userSchema = new mongoose.Schema({
         trim: true,
         index: true 
     },
-    avtar: {
+    avatar: {
         type: String, // cloudnary url
         required: true
     },
     coverImage: {
         type: String
     },
-  /*   wathHistory: [
+    wathHistory: [
         {
             type: Schema.Types.ObjectId,
             ref: "Video"
         }
-    ], */
+    ], 
     password: {
         type: String,
         required: [true, 'Password is required']
