@@ -3,7 +3,6 @@ import {ApiError} from "../utils/apiError.js"
 import { User } from "../models/user.models.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/apiResponse.js"
-import mongoose from "mongoose"
 import jwt from 'jsonwebtoken'
 
 
@@ -103,6 +102,7 @@ const loginUser = asyncHandler(async (req, res) => {
   // send cookie / secured cookie
 
   const {email, username, password} = req.body
+  console.log(email)
   if (!(username || email)) {
     throw new ApiError(400, "username or email is required")
   }
@@ -124,7 +124,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
    const {accessToken, refreshToken} = await generateAccessAndRefereshTokens(user._id)
 
-   const loggedInUser = User.findById(user._id).select("-password -refreshToken")
+   const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
    const options = {
     httpOnly: true,
@@ -152,17 +152,19 @@ const loginUser = asyncHandler(async (req, res) => {
 
 
 const logoutUser = asyncHandler(async(req, res) => {
-      await User.findByIdAndUpdate(
+      const logout = await User.findByIdAndUpdate(
           req.user._id,
           {
-            $set: {
-              refreshToken: undefined
+            /* $set: {refreshToken : undefined} // this does not work as this also sends refreshToken which we are trying to logout */
+            $unset: {
+              refreshToken: 1// this removes the field from document
             }
           },
           {
             new: true
           }
-        ) 
+        )
+        console.log(logout) 
         const options = {
           httpOnly: true,
           secure: true
